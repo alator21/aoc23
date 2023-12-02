@@ -1,6 +1,9 @@
 {
   "name": "aoc23",
   "type": "module",
+  "scripts": {
+    "execute" : "sh ./scripts/execute.sh $@"
+  },
   "devDependencies": {
     "bun-types": "latest"
   },
