@@ -1,73 +1,90 @@
-import {readInputContents} from "../utils.ts";
+import {isNumber, readInputContents, Solution} from "../utils.ts";
 
-const rawInput = await readInputContents(1, 3);
+class Day1Part2 implements Solution {
+    private static readonly DIGITS: Map<string, number> = new Map([
+        ['one', 1],
+        ['two', 2],
+        ['three', 3],
+        ['four', 4],
+        ['five', 5],
+        ['six', 6],
+        ['seven', 7],
+        ['eight', 8],
+        ['nine', 9],
+    ]);
 
-const DIGITS: Map<string, number> = new Map([
-    ['one', 1],
-    ['two', 2],
-    ['three', 3],
-    ['four', 4],
-    ['five', 5],
-    ['six', 6],
-    ['seven', 7],
-    ['eight', 8],
-    ['nine', 9],
-]);
-
-let sum = 0;
-for (const line of rawInput.split('\n')) {
-    const firstNumber = findFirstNumber(line);
-    const lastNumber = findLastNumber(line);
-    const combination = Number(`${firstNumber}${lastNumber}`);
-    if (isNaN(combination)) {
-        continue;
+    day(): number {
+        return 1;
     }
-    sum += combination;
-}
-console.log(sum);
 
-function findFirstNumber(str: string): number | undefined {
-    let digitAsText = ``;
-    for (const char of str) {
-        if (isNumber(char)) {
-            return Number(char);
-        }
-        digitAsText += char;
-        const t = textIsDigit(digitAsText);
-        if (t !== undefined) {
-            return t;
-        }
-
+    input(): number {
+        return 3;
     }
-    return undefined;
-}
 
-function findLastNumber(str: string): number | undefined {
-    let digitAsText = ``;
-    for (let i = str.length - 1; i >= 0; i--) {
-        const char = str[i];
-        if (isNumber(char)) {
-            return Number(char);
+    async result(): Promise<string> {
+        const rawInput = await readInputContents(this.day(), this.input());
+        let sum = 0;
+        for (const line of rawInput.split('\n')) {
+            const firstNumber = this.findFirstNumber(line);
+            const lastNumber = this.findLastNumber(line);
+            const combination = Number(`${firstNumber}${lastNumber}`);
+            if (isNaN(combination)) {
+                continue;
+            }
+            sum += combination;
         }
-        digitAsText = char + digitAsText;
-        const t = textIsDigit(digitAsText);
-        if (t !== undefined) {
-            return t;
-        }
+        return sum.toString(10);
     }
-    return undefined;
-}
 
+    findFirstNumber(str: string): number | undefined {
+        let digitAsText = ``;
+        for (const char of str) {
+            if (isNumber(char)) {
+                return Number(char);
+            }
+            digitAsText += char;
+            const t = this.textIsDigit(digitAsText);
+            if (t !== undefined) {
+                return t;
+            }
 
-function isNumber(char: string) {
-    return /^\d$/.test(char);
-}
-
-function textIsDigit(txt: string): number | undefined {
-    for (const digitAsText of DIGITS.keys()) {
-        if (txt.includes(digitAsText)) {
-            return DIGITS.get(digitAsText);
         }
+        return undefined;
     }
-    return undefined;
+
+    findLastNumber(str: string): number | undefined {
+        let digitAsText = ``;
+        for (let i = str.length - 1; i >= 0; i--) {
+            const char = str[i];
+            if (isNumber(char)) {
+                return Number(char);
+            }
+            digitAsText = char + digitAsText;
+            const t = this.textIsDigit(digitAsText);
+            if (t !== undefined) {
+                return t;
+            }
+        }
+        return undefined;
+    }
+
+    textIsDigit(txt: string): number | undefined {
+        for (const digitAsText of Day1Part2.DIGITS.keys()) {
+            if (txt.includes(digitAsText)) {
+                return Day1Part2.DIGITS.get(digitAsText);
+            }
+        }
+        return undefined;
+    }
+
+    expectedResult(): string {
+        return '55686';
+    }
+
 }
+
+const solution = new Day1Part2();
+const actualResult = await solution.result();
+const expectedResult = solution.expectedResult();
+console.log(actualResult);
+console.log(`Equal to expected: ${actualResult === expectedResult}`)

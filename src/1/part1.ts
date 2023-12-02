@@ -1,39 +1,56 @@
-import {readInputContents} from "../utils.ts";
+import {isNumber, readInputContents, Solution} from "../utils.ts";
 
-const rawInput = await readInputContents(1, 3);
-
-let sum = 0;
-for (const line of rawInput.split('\n')) {
-    const firstNumber = findFirstNumber(line);
-    const lastNumber = findLastNumber(line);
-    const combination = Number(`${firstNumber}${lastNumber}`);
-    if (isNaN(combination)) {
-        continue;
+class Day1Part1 implements Solution {
+    day(): number {
+        return 1;
     }
-    sum += combination;
-}
-console.log(sum);
 
-function findFirstNumber(str: string): number | undefined {
-    for (const char of str) {
-        if (isNumber(char)) {
-            return Number(char);
+    input(): number {
+        return 3;
+    }
+
+    async result(): Promise<string> {
+        const rawInput = await readInputContents(this.day(), this.input());
+        let sum = 0;
+        for (const line of rawInput.split('\n')) {
+            const firstNumber = this.findFirstNumber(line);
+            const lastNumber = this.findLastNumber(line);
+            const combination = Number(`${firstNumber}${lastNumber}`);
+            if (isNaN(combination)) {
+                continue;
+            }
+            sum += combination;
         }
+        return sum.toString(10);
     }
-    return undefined;
-}
 
-function findLastNumber(str: string): number | undefined {
-    for (let i = str.length - 1; i >= 0; i--) {
-        const char = str[i];
-        if (isNumber(char)) {
-            return Number(char);
+    findFirstNumber(str: string): number | undefined {
+        for (const char of str) {
+            if (isNumber(char)) {
+                return Number(char);
+            }
         }
+        return undefined;
     }
-    return undefined;
+
+    findLastNumber(str: string): number | undefined {
+        for (let i = str.length - 1; i >= 0; i--) {
+            const char = str[i];
+            if (isNumber(char)) {
+                return Number(char);
+            }
+        }
+        return undefined;
+    }
+
+    expectedResult(): string {
+        return '55029';
+    }
+
 }
 
-
-function isNumber(char: string) {
-    return /^\d$/.test(char);
-}
+const solution = new Day1Part1();
+const actualResult = await solution.result();
+const expectedResult = solution.expectedResult();
+console.log(actualResult);
+console.log(`Equal to expected: ${actualResult === expectedResult}`)
