@@ -14,6 +14,10 @@ class Day2Part1 implements Solution {
         return 2;
     }
 
+    part(): 1 | 2 {
+        return 1;
+    }
+
     input(): number {
         return 2;
     }

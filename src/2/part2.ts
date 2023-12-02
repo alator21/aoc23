@@ -5,6 +5,10 @@ class Day2Part2 implements Solution {
         return 2;
     }
 
+    part(): 1 | 2 {
+        return 2;
+    }
+
     input(): number {
         return 2;
     }

@@ -13,6 +13,8 @@ export function isNumber(char: string) {
 export interface Solution {
     day(): number;
 
+    part(): 1 | 2;
+
     input(): number;
 
     result(): Promise<string>;
@@ -22,6 +24,7 @@ export interface Solution {
 
 
 export async function prettyPrintSolution(solution: Solution): Promise<void> {
+    console.log(`This is the solution for day ${solution.day()}, part ${solution.part()}, using input ${solution.input()}!`)
     const actualResult = await solution.result();
     const expectedResult = solution.expectedResult();
     console.log(`❤️ ${actualResult} ❤️`);
