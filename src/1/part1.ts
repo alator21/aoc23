@@ -52,5 +52,5 @@ class Day1Part1 implements Solution {
 const solution = new Day1Part1();
 const actualResult = await solution.result();
 const expectedResult = solution.expectedResult();
-console.log(actualResult);
+console.log(`❤️ ${actualResult} ❤️`);
 console.log(`Equal to expected: ${actualResult === expectedResult}`)
