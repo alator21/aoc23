@@ -1,4 +1,4 @@
-import {isNumber, readInputContents, Solution} from "../utils.ts";
+import {isNumber, prettyPrintSolution, readInputContents, Solution} from "../utils.ts";
 
 class Day1Part2 implements Solution {
     private static readonly DIGITS: Map<string, number> = new Map([
@@ -84,7 +84,4 @@ class Day1Part2 implements Solution {
 }
 
 const solution = new Day1Part2();
-const actualResult = await solution.result();
-const expectedResult = solution.expectedResult();
-console.log(`❤️ ${actualResult} ❤️`);
-console.log(`Equal to expected: ${actualResult === expectedResult}`)
+await prettyPrintSolution(solution);

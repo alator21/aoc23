@@ -19,3 +19,16 @@ export interface Solution {
 
     expectedResult(): string;
 }
+
+
+export async function prettyPrintSolution(solution: Solution): Promise<void> {
+    const actualResult = await solution.result();
+    const expectedResult = solution.expectedResult();
+    console.log(`❤️ ${actualResult} ❤️`);
+    const test = actualResult === expectedResult;
+    if (test) {
+        console.log(`👏 Equal to expected 👏`)
+        return;
+    }
+    console.log(`🥵 Not equal to expected(${expectedResult})  🥵`)
+}
