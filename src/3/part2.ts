@@ -1,4 +1,11 @@
-import {isNumber, prettyPrintSolution, readInputContents, Solution} from "../utils.ts";
+import {
+    isNumber,
+    prettyPrintSolution,
+    productOfCollection,
+    readInputContents,
+    Solution,
+    sumOfCollection
+} from "../utils.ts";
 
 class Day3Part2 implements Solution {
     day(): number {
@@ -16,9 +23,43 @@ class Day3Part2 implements Solution {
     async result(): Promise<string> {
         const rawInput = await readInputContents(this.day(), this.input());
         // console.log(rawInput);
+        const inputAsArray: Array<Array<string>> = this.convertInputToArray(rawInput)
+        const rows = inputAsArray.length;
+        const columns = inputAsArray[0].length;
+        // console.log(inputAsArray);
+        const starsIndices = this.findStarsIndices(inputAsArray);
+        // console.log(symbolIndices);
+        const gearRatios: number[] = [];
+        for (const star of starsIndices) {
+            const startOfNumbersAdjacentToStar: Set<string> = new Set();
+            const adjacentIndices = this.findAdjacentIndices(star, rows, columns);
+            for (const coordinatesOfAdjacentCell of adjacentIndices) {
+                const i = coordinatesOfAdjacentCell[0];
+                const j = coordinatesOfAdjacentCell[1];
+                const valueOfCell = inputAsArray[i][j];
+                if (!isNumber(valueOfCell)) {
+                    continue;
+                }
+                const startingCoordinatesOfNumber = this.findStartingCoordinatesOfNumber(coordinatesOfAdjacentCell, inputAsArray)
+                startOfNumbersAdjacentToStar.add(this.stringifyCoordinates(startingCoordinatesOfNumber));
+            }
+            if (startOfNumbersAdjacentToStar.size === 2) {
+                const numbers = Array.from(startOfNumbersAdjacentToStar)
+                    .map(r => {
+                        return this.findNumberByStartingCoordinates(this.extractCoordinates(r), inputAsArray);
+                    })
+                const gearRatio = productOfCollection(numbers);
+                gearRatios.push(gearRatio);
+            }
+        }
+        return sumOfCollection(gearRatios).toString(10);
+    }
+
+    convertInputToArray(input: string): Array<Array<string>> {
+        const splitInput = input.split('\n');
         const inputAsArray: Array<Array<string>> = [];
-        let i = 0;
-        for (const line of rawInput.split('\n')) {
+        for (let i = 0; i < splitInput.length; i++) {
+            const line = splitInput[i];
             inputAsArray[i] = [];
             for (let j = 0; j < line.length; j++) {
                 const r = line.at(j);
@@ -27,62 +68,11 @@ class Day3Part2 implements Solution {
                 }
                 inputAsArray[i][j] = r;
             }
-            i++;
         }
-        // console.log(inputAsArray);
-        const starsIndices = this.findStarsIndices(inputAsArray);
-        // console.log(symbolIndices);
-        // console.log('--')
-        const startOfAllGoodNumbers: Set<string> = new Set();
-        const gearRatios: number[] = [];
-        for (const s of starsIndices) {
-            const startOfNumbersAdjacentToStar: Set<string> = new Set();
-            const adjacentIndices = this.findAdjacentIndices(s, inputAsArray.length, inputAsArray[0].length);
-            for (const adj of adjacentIndices) {
-                const i = adj[0];
-                const j = adj[1];
-                const a = inputAsArray[i][j];
-                if (!isNumber(a)) {
-                    continue;
-                }
-                const b = this.findStartOfNumber(adj, inputAsArray)
-                startOfNumbersAdjacentToStar.add(this.tempReverse(b));
-                // startOfAllGoodNumbers.add(this.tempReverse(b))
-                // console.log('**************')
-                // console.log(b);
-            }
-            if (startOfNumbersAdjacentToStar.size === 2) {
-                const numbers = Array.from(startOfNumbersAdjacentToStar)
-                    .map(r => {
-                        return this.findNumberByStartingCoordinates(this.temp(r), inputAsArray);
-                    })
-
-                const gearRatio = numbers.reduce((a, b) => a * b, 1)
-                gearRatios.push(gearRatio);
-            }
-
-            // console.log(s);
-            // console.log(adjacentIndices);
-        }
-        return gearRatios.reduce((a, b) => a + b, 0).toFixed(10);
+        return inputAsArray;
     }
 
-    findSymbolsIndices(inputAsArray: Array<Array<string>>): Set<[number, number]> {
-        const indices: Set<string> = new Set();
-        for (let i = 0; i < inputAsArray.length; i++) {
-            const row = inputAsArray[i];
-            for (let j = 0; j < row.length; j++) {
-                const n = row[j];
-                if (n === '.' || isNumber(n)) {
-                    continue;
-                }
-                indices.add(`${i},${j}`);
-            }
-        }
-        return new Set(Array.from(indices).map(r => this.temp(r)));
-    }
-
-    findStarsIndices(inputAsArray: Array<Array<string>>): Set<[number, number]> {
+    findStarsIndices(inputAsArray: Array<Array<string>>): Array<[number, number]> {
         const indices: Set<string> = new Set();
         for (let i = 0; i < inputAsArray.length; i++) {
             const row = inputAsArray[i];
@@ -91,45 +81,50 @@ class Day3Part2 implements Solution {
                 if (n !== '*') {
                     continue;
                 }
-                indices.add(`${i},${j}`);
+                indices.add(this.stringifyCoordinates([i, j]));
             }
         }
-        return new Set(Array.from(indices).map(r => this.temp(r)));
+        return Array.from(indices).map(r => this.extractCoordinates(r));
     }
 
-    findAdjacentIndices(coordinates: [number, number], rows: number, columns: number): Set<[number, number]> {
+    findAdjacentIndices(coordinates: [number, number], rows: number, columns: number): Array<[number, number]> {
         const i = coordinates[0];
         const j = coordinates[1];
         const indices: Set<string> = new Set();
+        const up = i - 1;
+        const down = i + 1;
+        const rowMiddle = i;
+        const colMiddle = j;
+        const left = j - 1;
+        const right = j + 1;
         if (i > 0) {
-            indices.add(`${i - 1},${j}`); // up
+            indices.add(this.stringifyCoordinates([up, colMiddle]))
             if (j > 0) {
-                indices.add(`${i - 1},${j - 1}`); // up-left
+                indices.add(this.stringifyCoordinates([up, left]))
             }
             if (j < columns - 1) {
-                indices.add(`${i - 1},${j + 1}`); // up-right
+                indices.add(this.stringifyCoordinates([up, right]))
             }
         }
         if (i < rows - 1) {
-            indices.add(`${i + 1},${j}`); // down
+            indices.add(this.stringifyCoordinates([down, colMiddle]))
             if (j > 0) {
-                indices.add(`${i + 1},${j - 1}`); // down-left
+                indices.add(this.stringifyCoordinates([down, left]));
             }
             if (j < columns - 1) {
-                indices.add(`${i + 1},${j + 1}`); // down-right
+                indices.add(this.stringifyCoordinates([down, right]));
             }
         }
         if (j > 0) {
-            indices.add(`${i},${j - 1}`); // left
+            indices.add(this.stringifyCoordinates([rowMiddle, left]));
         }
         if (j < columns - 1) {
-            indices.add(`${i},${j + 1}`); // right
+            indices.add(this.stringifyCoordinates([rowMiddle, right]));
         }
-        return new Set(Array.from(indices).map(r => this.temp(r)));
+        return Array.from(indices).map(r => this.extractCoordinates(r));
     }
 
-
-    findStartOfNumber(coordinates: [number, number], input: Array<Array<string>>): [number, number] {
+    findStartingCoordinatesOfNumber(coordinates: [number, number], input: Array<Array<string>>): [number, number] {
         const i = coordinates[0];
         let j = coordinates[1];
         while (true) {
@@ -147,37 +142,32 @@ class Day3Part2 implements Solution {
     findNumberByStartingCoordinates(coordinates: [number, number], input: Array<Array<string>>): number {
         const i = coordinates[0];
         let j = coordinates[1];
-        // console.log(i, j);
         let numberAsString = ``;
 
-        let temp = input[i][j];
-        // console.log(temp);
-        while (isNumber(temp)) {
-            numberAsString += temp;
+        let valueOfCell = input[i][j];
+        while (isNumber(valueOfCell)) {
+            numberAsString += valueOfCell;
             j++;
-            temp = input[i][j];
+            valueOfCell = input[i][j];
         }
         return Number(numberAsString);
     }
 
-    temp(r: string): [number, number] {
+    extractCoordinates(r: string): [number, number] {
         const spl = r.split(',');
         const i = spl[0];
         const j = spl[1];
         return [Number(i), Number(j)];
     }
 
-    tempReverse(coordinates: [number, number]): string {
+    stringifyCoordinates(coordinates: [number, number]): string {
         return `${coordinates[0]},${coordinates[1]}`;
     }
 
     expectedResult(): string {
-        return "467835";
+        return "87605697";
     }
 }
 
-const
-    solution = new Day3Part2();
-await
-
-    prettyPrintSolution(solution);
+const solution = new Day3Part2();
+await prettyPrintSolution(solution);
