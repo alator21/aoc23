@@ -1,4 +1,5 @@
-import {isNumber, prettyPrintSolution, readInputContents, Solution} from "../utils.ts";
+import {prettyPrintSolution, readInputContents, Solution} from "../utils/utils.ts";
+import {isNumber} from "../utils/StringOperations.ts";
 
 class Day1Part2 implements Solution {
     private static readonly DIGITS: Map<string, number> = new Map([

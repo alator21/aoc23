@@ -6,22 +6,6 @@ export async function readInputContents(
     return Bun.file(fileName).text();
 }
 
-export function isNumber(char: string) {
-    return /^\d$/.test(char);
-}
-
-export function sumOfCollection(coll: Array<number>): number {
-    return coll.reduce((a, b) => a + b, 0);
-}
-
-export function productOfCollection(coll: Array<number>): number {
-    return coll.reduce((a, b) => a * b, 1)
-}
-
-export function splitBySpaces(coll: string): string[] {
-    return coll.split(/ +/);
-}
-
 export interface Solution {
     day(): number;
 

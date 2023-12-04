@@ -1,11 +1,10 @@
 import {
-    isNumber,
     prettyPrintSolution,
-    productOfCollection,
     readInputContents,
     Solution,
-    sumOfCollection
-} from "../utils.ts";
+} from "../utils/utils.ts";
+import {isNumber} from "../utils/StringOperations.ts";
+import {productOfCollection, sumOfCollection} from "../utils/CollectionOperations.ts";
 
 class Day3Part2 implements Solution {
     day(): number {

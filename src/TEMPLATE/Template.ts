@@ -1,4 +1,4 @@
-import {prettyPrintSolution, readInputContents, Solution} from "../utils.ts";
+import {prettyPrintSolution, readInputContents, Solution} from "../utils/utils.ts";
 
 class DayXPart1 implements Solution {
     day(): number {

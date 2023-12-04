@@ -1,4 +1,10 @@
-import {prettyPrintSolution, readInputContents, Solution, splitBySpaces, sumOfCollection} from "../utils.ts";
+import {
+    prettyPrintSolution,
+    readInputContents,
+    Solution,
+} from "../utils/utils.ts";
+import {splitBySpaces} from "../utils/StringOperations.ts";
+import {sumOfCollection} from "../utils/CollectionOperations.ts";
 
 class Day4Part2 implements Solution {
     day(): number {

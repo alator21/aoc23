@@ -1,4 +1,6 @@
-import {prettyPrintSolution, readInputContents, Solution, sumOfCollection} from "../utils.ts";
+import {prettyPrintSolution, readInputContents, Solution,} from "../utils/utils.ts";
+import {splitBySpaces} from "../utils/StringOperations.ts";
+import {sumOfCollection} from "../utils/CollectionOperations.ts";
 
 class Day4Part1 implements Solution {
     day(): number {
@@ -18,19 +20,12 @@ class Day4Part1 implements Solution {
         const numberOfWinningNumbersPerCard: number[] = [];
         for (const line of rawInput.split('\n')) {
             const parts = line.split('|');
-            // console.log(parts);
             const firstPart = parts[0].trim();
             const secondPart = parts[1].trim();
 
-
             const winningNumbersRaw = firstPart.split(':')[1].trim();
-            const winningNumbers = winningNumbersRaw.split(' ').map(r => Number(r));
-            const pickedNumbers = secondPart.trim().split(/ +/).map(r => Number(r));
-            // console.log(firstPart);
-            // console.log(winningNumbersRaw)
-            // console.log(winningNumbers)
-            // console.log(pickedNumbers);
-            // console.log(pickedNumbers.length);
+            const winningNumbers = splitBySpaces(winningNumbersRaw).map(r => Number(r));
+            const pickedNumbers = splitBySpaces(secondPart).map(r => Number(r));
 
             numberOfWinningNumbersPerCard.push(winningNumbers.filter(r => pickedNumbers.includes(r)).length)
 

@@ -1,4 +1,6 @@
-import {isNumber, prettyPrintSolution, readInputContents, Solution, sumOfCollection} from "../utils.ts";
+import {prettyPrintSolution, readInputContents, Solution} from "../utils/utils.ts";
+import {isNumber} from "../utils/StringOperations.ts";
+import {sumOfCollection} from "../utils/CollectionOperations.ts";
 
 class Day3Part1 implements Solution {
     day(): number {

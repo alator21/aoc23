@@ -1,4 +1,4 @@
-import {prettyPrintSolution, readInputContents, Solution} from "../utils.ts";
+import {prettyPrintSolution, readInputContents, Solution} from "../utils/utils.ts";
 
 class Day2Part1 implements Solution {
     private static readonly TARGETS: Map<string, number> = new Map([
