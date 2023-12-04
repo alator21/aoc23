@@ -30,10 +30,8 @@ class Day4Part1 implements Solution {
             numberOfWinningNumbersPerCard.push(winningNumbers.filter(r => pickedNumbers.includes(r)).length)
 
         }
-        // console.log(numberOfWinningNumbersPerCard);
         const calcPerCard = numberOfWinningNumbersPerCard
             .map(r => this.calcResultOfCard(r))
-        console.log(calcPerCard)
         return sumOfCollection(calcPerCard).toString(10);
     }
 
@@ -45,7 +43,6 @@ class Day4Part1 implements Solution {
         for (let i = 1; i < n; i++) {
             result *= 2;
         }
-
         return result;
     }
 
