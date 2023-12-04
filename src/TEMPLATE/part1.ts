@@ -21,7 +21,7 @@ class DayXPart1 implements Solution {
     }
 
     expectedResult(): string {
-        return "2369";
+        return "42";
     }
 }
 
