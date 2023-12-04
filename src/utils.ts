@@ -18,6 +18,10 @@ export function productOfCollection(coll: Array<number>): number {
     return coll.reduce((a, b) => a * b, 1)
 }
 
+export function splitBySpaces(coll: string): string[] {
+    return coll.split(/ +/);
+}
+
 export interface Solution {
     day(): number;
 
