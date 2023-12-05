@@ -1,5 +1,4 @@
 import {prettyPrintSolution, readInputContents, Solution} from "../utils/utils.ts";
-import {cursorTo} from "readline";
 
 class Day5Part2 implements Solution {
     day(): number {
@@ -43,11 +42,11 @@ class Day5Part2 implements Solution {
         }
         const rangesOfLocations: Array<[number, number]> = [];
         for (const seed of seeds) {
-            let current = [seed];
+            let locationsOfSeed = [seed];
             for (const t of sourceToDestination) {
-                current = this.getVal(current, t);
+                locationsOfSeed = this.calculateLocationsOfSeed(locationsOfSeed, t);
             }
-            rangesOfLocations.push(...current);
+            rangesOfLocations.push(...locationsOfSeed);
         }
         const numbers = Array.from(new Set(rangesOfLocations.map(r => r[0])))
             .sort((a, b) => a - b).filter(r => r !== 0);
@@ -59,17 +58,17 @@ class Day5Part2 implements Solution {
     }
 
 
-    getVal(n: Array<[number, number]>, sourceToDestination: Array<[number, number, number]>): Array<[number, number]> {
-        const a: Array<[number, number]> = [];
+    calculateLocationsOfSeed(n: Array<[number, number]>, sourceToDestination: Array<[number, number, number]>): Array<[number, number]> {
+        const locations: Array<[number, number]> = [];
         for (const [seedStart, seedRange] of n) {
-            const good: Array<[number, number]> = [];
-            this.tt([seedStart, seedRange], good, sourceToDestination)
-            a.push(...good);
+            const partialLocations: Array<[number, number]> = [];
+            this.actualCalculation([seedStart, seedRange], partialLocations, sourceToDestination)
+            locations.push(...partialLocations);
         }
-        return a;
+        return locations;
     }
 
-    tt(n: [number, number], good: Array<[number, number]>, sourceToDestination: Array<[number, number, number]>): void {
+    actualCalculation(n: [number, number], partialLocations: Array<[number, number]>, sourceToDestination: Array<[number, number, number]>): void {
         const translate = (n: number, [d, s, r]: [number, number, number]) => {
             const inc = d - s;
             if (s <= n && n <= s + r) {
@@ -95,7 +94,7 @@ class Day5Part2 implements Solution {
                 const seedLowestThatOverlaps = seedStart > source ? seedStart : source;
                 const seedHighestThatOverlaps = seedLowestThatOverlaps + (highestOfSeed < highestSource ? seedRange : /*range*/lowestOfSeed - lowestSource)
 
-                good.push([translate(seedLowestThatOverlaps, [dest, source, range]), seedHighestThatOverlaps - seedLowestThatOverlaps])
+                partialLocations.push([translate(seedLowestThatOverlaps, [dest, source, range]), seedHighestThatOverlaps - seedLowestThatOverlaps])
                 remaining = remaining.filter(([s, r]) => s !== seedStart && r !== seedRange)
                 if (seedLowestThatOverlaps - seedStart > 0) {
                     remaining.push([seedStart, seedLowestThatOverlaps - seedStart])
@@ -105,9 +104,8 @@ class Day5Part2 implements Solution {
                 }
             }
         }
-
         for (const [seedStart, seedRange] of remaining) {
-            good.push([seedStart, seedRange])
+            partialLocations.push([seedStart, seedRange])
         }
     }
 

@@ -1,16 +1,6 @@
 import {prettyPrintSolution, readInputContents, Solution} from "../utils/utils.ts";
 
 class Day5Part1 implements Solution {
-    private static readonly CATEGORIES = new Map([
-        [0, 'soil'],
-        [1, 'fertilizer'],
-        [2, 'water'],
-        [3, 'light'],
-        [4, 'temperature'],
-        [5, 'humidity'],
-        [6, 'location'],
-    ])
-
     day(): number {
         return 5;
     }
@@ -50,37 +40,30 @@ class Day5Part1 implements Solution {
             this.fill(sourceToDestination[newBlock], line);
 
         }
-        console.log(sourceToDestination);
-        const locations:number[] = [];
+        const locations: number[] = [];
         for (const seed of seeds) {
-            console.log(seed);
             let current = seed;
             for (const t of sourceToDestination) {
-                current = this.getVal(current, t);
-                console.log(current);
+                current = this.calculateLocation(current, t);
             }
             locations.push(current);
-            console.log('end');
         }
-        // console.log(sourceToDestination);
-        // console.log(seeds);
         return Math.min(...locations).toString(10);
     }
 
     expectedResult(): string {
-        return "35";
+        return "199602917";
     }
 
 
-    getVal(n: number, sourceToDestination: Array<[number, number, number]>): number {
+    calculateLocation(seed: number, sourceToDestination: Array<[number, number, number]>): number {
         for (const [dest, source, range] of sourceToDestination) {
-            // console.log([dest,source,range]);
-            const inc = dest-source;
-            if (source <= n && n <= source + range) {
-                return n + inc;
+            const inc = dest - source;
+            if (source <= seed && seed <= source + range) {
+                return seed + inc;
             }
         }
-        return n;
+        return seed;
     }
 
     private fill(sourceToDestination: Array<[number, number, number]>, line: string) {
@@ -89,10 +72,6 @@ class Day5Part1 implements Solution {
         const source = elements[1];
         const range = elements[2];
         sourceToDestination.push([destination, source, range])
-        // console.log([destination, source, range])
-        // for (let i = 0; i < range; i++) {
-        //     sourceToDestination.set(source + i, destination + i)
-        // }
     }
 }
 
