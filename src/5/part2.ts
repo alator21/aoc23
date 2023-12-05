@@ -1,16 +1,7 @@
 import {prettyPrintSolution, readInputContents, Solution} from "../utils/utils.ts";
+import {cursorTo} from "readline";
 
 class Day5Part2 implements Solution {
-    private static readonly CATEGORIES = new Map([
-        [0, 'soil'],
-        [1, 'fertilizer'],
-        [2, 'water'],
-        [3, 'light'],
-        [4, 'temperature'],
-        [5, 'humidity'],
-        [6, 'location'],
-    ])
-
     day(): number {
         return 5;
     }
@@ -26,7 +17,7 @@ class Day5Part2 implements Solution {
     async result(): Promise<string> {
         const rawInput = await readInputContents(this.day(), this.input());
         const split = rawInput.split('\n');
-        const seeds: number[] = [];
+        const seeds: Array<[number, number]> = [];
         const sourceToDestination: Array/*conversions*/<Array/*many-materials*/<[number, number, number]>> = [];
 
         let newBlock = -1;
@@ -50,38 +41,74 @@ class Day5Part2 implements Solution {
             this.fill(sourceToDestination[newBlock], line);
 
         }
-        console.log(seeds);
-
-        console.log(sourceToDestination);
-        const locations: number[] = [];
+        const rangesOfLocations: Array<[number, number]> = [];
         for (const seed of seeds) {
-            console.log(seed);
-            let current = seed;
+            let current = [seed];
             for (const t of sourceToDestination) {
                 current = this.getVal(current, t);
-                console.log(current);
             }
-            locations.push(current);
-            console.log('end');
+            rangesOfLocations.push(...current);
         }
-        return Math.min(...locations).toString(10);
-        // return '5';
+        const numbers = Array.from(new Set(rangesOfLocations.map(r => r[0])))
+            .sort((a, b) => a - b).filter(r => r !== 0);
+        return numbers[0].toString(10);
     }
 
     expectedResult(): string {
-        return "46";
+        return "2254686";
     }
 
 
-    getVal(n: number, sourceToDestination: Array<[number, number, number]>): number {
-        for (const [dest, source, range] of sourceToDestination) {
-            // console.log([dest,source,range]);
-            const inc = dest - source;
-            if (source <= n && n <= source + range) {
+    getVal(n: Array<[number, number]>, sourceToDestination: Array<[number, number, number]>): Array<[number, number]> {
+        const a: Array<[number, number]> = [];
+        for (const [seedStart, seedRange] of n) {
+            const good: Array<[number, number]> = [];
+            this.tt([seedStart, seedRange], good, sourceToDestination)
+            a.push(...good);
+        }
+        return a;
+    }
+
+    tt(n: [number, number], good: Array<[number, number]>, sourceToDestination: Array<[number, number, number]>): void {
+        const translate = (n: number, [d, s, r]: [number, number, number]) => {
+            const inc = d - s;
+            if (s <= n && n <= s + r) {
                 return n + inc;
             }
+            return n;
         }
-        return n;
+        let remaining: Array<[number, number]> = [n];
+        for (const [seedStart, seedRange] of remaining) {
+            for (const [dest, source, range] of sourceToDestination) {
+                const lowestOfSeed = seedStart; // 79
+                const highestOfSeed = seedStart + seedRange; // 93
+
+                const lowestSource = source; //50
+                const highestSource = source + range; //98
+
+                if (highestOfSeed < lowestSource) {
+                    continue;
+                }
+                if (lowestOfSeed > highestSource) {
+                    continue;
+                }
+                const seedLowestThatOverlaps = seedStart > source ? seedStart : source;
+                const seedHighestThatOverlaps = seedLowestThatOverlaps + (highestOfSeed < highestSource ? seedRange : /*range*/lowestOfSeed - lowestSource)
+
+                good.push([translate(seedLowestThatOverlaps, [dest, source, range]), seedHighestThatOverlaps - seedLowestThatOverlaps])
+                remaining = remaining.filter(([s, r]) => s !== seedStart && r !== seedRange)
+                if (seedLowestThatOverlaps - seedStart > 0) {
+                    remaining.push([seedStart, seedLowestThatOverlaps - seedStart])
+                }
+                if (highestOfSeed - highestSource > 0) {
+                    remaining.push([seedHighestThatOverlaps, highestOfSeed - highestSource])
+                }
+            }
+        }
+
+        for (const [seedStart, seedRange] of remaining) {
+            good.push([seedStart, seedRange])
+        }
     }
 
     private fill(sourceToDestination: Array<[number, number, number]>, line: string) {
@@ -90,23 +117,14 @@ class Day5Part2 implements Solution {
         const source = elements[1];
         const range = elements[2];
         sourceToDestination.push([destination, source, range])
-        // console.log([destination, source, range])
-        // for (let i = 0; i < range; i++) {
-        //     sourceToDestination.set(source + i, destination + i)
-        // }
     }
 
-    private calculateSeeds(seeds: number[], input: number[]) {
+    private calculateSeeds(seeds: Array<[number, number]>, input: number[]) {
         for (let i = 0; i < input.length; i += 2) {
             const start = input[i];
             const range = input[i + 1];
-            // console.log([start, range])
-            for (let j = start; j < start + range; j++) {
-                seeds.push(j);
-            }
+            seeds.push([start, range])
         }
-        // console.log('ee')
-
     }
 }
 
