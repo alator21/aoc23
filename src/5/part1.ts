@@ -27,7 +27,7 @@ class Day5Part1 implements Solution {
         const rawInput = await readInputContents(this.day(), this.input());
         const split = rawInput.split('\n');
         const seeds: number[] = [];
-        const sourceToDestination: Array<Map<number, number>> = [];
+        const sourceToDestination: Array/*conversions*/<Array/*many-materials*/<[number, number, number]>> = [];
 
         let newBlock = -1;
         for (let i = 0; i < split.length; i++) {
@@ -44,44 +44,55 @@ class Day5Part1 implements Solution {
                 newBlock++;
                 continue;
             }
-            const map = sourceToDestination.at(newBlock);
-            if (map === undefined) {
-                sourceToDestination[newBlock] = new Map();
+            if (sourceToDestination.at(newBlock) === undefined) {
+                sourceToDestination[newBlock] = [];
             }
-
             this.fill(sourceToDestination[newBlock], line);
 
         }
-        for (const seed of seeds){
+        console.log(sourceToDestination);
+        const locations:number[] = [];
+        for (const seed of seeds) {
             console.log(seed);
             let current = seed;
-            for (const t of sourceToDestination){
-                const newVar = t.get(current);
-                if (newVar !== undefined){
-                    current = newVar;
-                }
+            for (const t of sourceToDestination) {
+                current = this.getVal(current, t);
                 console.log(current);
             }
+            locations.push(current);
             console.log('end');
         }
         // console.log(sourceToDestination);
         // console.log(seeds);
-        return '42';
+        return Math.min(...locations).toString(10);
     }
 
     expectedResult(): string {
         return "35";
     }
 
-    private fill(sourceToDestination: Map<number, number>, line: string) {
+
+    getVal(n: number, sourceToDestination: Array<[number, number, number]>): number {
+        for (const [dest, source, range] of sourceToDestination) {
+            // console.log([dest,source,range]);
+            const inc = dest-source;
+            if (source <= n && n <= source + range) {
+                return n + inc;
+            }
+        }
+        return n;
+    }
+
+    private fill(sourceToDestination: Array<[number, number, number]>, line: string) {
         const elements = line.split(' ').map(r => Number(r));
         const destination = elements[0];
         const source = elements[1];
         const range = elements[2];
+        sourceToDestination.push([destination, source, range])
         // console.log([destination, source, range])
-        for (let i = 0; i < range; i++) {
-            sourceToDestination.set(source + i, destination + i)
-        }
+        // for (let i = 0; i < range; i++) {
+        //     sourceToDestination.set(source + i, destination + i)
+        // }
     }
 }
 
